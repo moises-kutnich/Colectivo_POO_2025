@@ -11,10 +11,10 @@ import org.apache.logging.log4j.Logger;
  * Clase principal del proyecto (Entry Point). 
  * Su única responsabilidad es lanzar la implementación de la UI.
  */
-public class MainApp {
+public class AplicacionPrincipal {
     
     // LÍNEA DE LOG4J: Instancia del Logger (para esta clase)
-    private static final Logger logger = LogManager.getLogger(MainApp.class);
+    private static final Logger logger = LogManager.getLogger(AplicacionPrincipal.class);
     
     public static void main(String[] args) {
         

@@ -5,11 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import colectivo.logica.GestionColectivos;
 
 // Log4j2
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import colectivo.negocio.GestionColectivos;
 
 /**
  * Clase principal de la interfaz JavaFX.

@@ -2,54 +2,43 @@ package colectivo.secuencial;
 
 import colectivo.dao.ParadaDAO;
 import colectivo.modelo.Parada;
-import colectivo.util.ArchivoUtil;
 import colectivo.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.*;
 import java.util.*;
 
-/**
- * DAO secuencial para Parada. Devuelve Map<String, Parada>.
- */
 public class ParadaSecuencialDAO implements ParadaDAO {
-
     private static final Logger logger = LogManager.getLogger(ParadaSecuencialDAO.class);
-
-    private final Map<String, Parada> cacheParadas = new LinkedHashMap<>();
+    private final Map<String, Parada> cache = new LinkedHashMap<>();
     private boolean cargado = false;
 
     @Override
     public Map<String, Parada> buscarTodos() {
-        if (cargado) {
-            logger.debug("Paradas ya cargadas, devolviendo caché.");
-            return cacheParadas;
-        }
-        cargado = true;
-
+        if (cargado) return cache;
         String ruta = Config.getInstance().get("ruta.paradas", "doc/parada_PM.txt");
-        logger.info("Leyendo paradas desde {}", ruta);
-
-        List<String> lineas = ArchivoUtil.leerArchivo(ruta);
-        for (String linea : lineas) {
-            try {
-                String[] partes = Arrays.stream(linea.split(";"))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .toArray(String[]::new);
-                if (partes.length >= 2) {
-                    String id = partes[0];
-                    String nombre = partes[1];
-                    cacheParadas.put(id, new Parada(id, nombre));
-                } else {
-                    logger.warn("Línea inválida en paradas (omitida): {}", linea);
+        try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                String[] parts = Arrays.stream(line.split(";")).map(String::trim).toArray(String[]::new);
+                if (parts.length < 2) {
+                    logger.warn("Línea de parada inválida (omitida): {}", line);
+                    continue;
                 }
-            } catch (Exception e) {
-                logger.warn("Error procesando línea de paradas '{}': {}", linea, e.getMessage());
+                String id = parts[0];
+                String nombre = parts[1];
+                cache.put(id, new Parada(id, nombre));
             }
+            cargado = true;
+            logger.info("Paradas cargadas: {}", cache.size());
+        } catch (FileNotFoundException e) {
+            logger.error("Archivo paradas no encontrado: " + ruta, e);
+        } catch (IOException e) {
+            logger.error("Error leyendo paradas: " + ruta, e);
         }
-
-        logger.info("Total de paradas cargadas: {}", cacheParadas.size());
-        return cacheParadas;
+        return cache;
     }
 }

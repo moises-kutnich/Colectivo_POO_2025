@@ -1,4 +1,4 @@
-package colectivo.logica;
+package colectivo.negocio;
 
 import colectivo.modelo.*;
 

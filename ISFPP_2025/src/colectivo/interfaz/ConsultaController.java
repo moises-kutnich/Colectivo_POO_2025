@@ -3,9 +3,9 @@ package colectivo.interfaz;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import colectivo.logica.GestionColectivos;
 import colectivo.modelo.Parada;
 import colectivo.modelo.Recorrido;
+import colectivo.negocio.GestionColectivos;
 import colectivo.util.MensajeUtil;
 
 import java.util.List;

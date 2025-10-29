@@ -1,27 +1,22 @@
 package colectivo.secuencial;
 
-import colectivo.dao.DAOFactory;
-import colectivo.dao.TramoDAO;
-import colectivo.dao.ParadaDAO;
-import colectivo.dao.LineaDAO;
+import colectivo.dao.*;
 
-/**
- * Fábrica de DAOs para archivos de texto (secuencial).
- */
-public class TextDAOFactory extends DAOFactory {
+public class TextDAOFactory extends colectivo.dao.DAOFactory {
 
-    @Override
     public TramoDAO getTramoDAO() {
         return new TramoSecuencialDAO();
     }
 
-    @Override
     public ParadaDAO getParadaDAO() {
         return new ParadaSecuencialDAO();
     }
 
-    @Override
     public LineaDAO getLineaDAO() {
         return new LineaSecuencialDAO();
+    }
+
+    public FrecuenciaDAO getFrecuenciaDAO() {
+        return new FrecuenciaSecuencialDAO();
     }
 }

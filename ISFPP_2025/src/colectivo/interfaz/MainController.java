@@ -6,7 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import colectivo.logica.GestionColectivos;
+import colectivo.negocio.GestionColectivos;
 import colectivo.util.MensajeUtil;
 
 import org.apache.logging.log4j.LogManager;

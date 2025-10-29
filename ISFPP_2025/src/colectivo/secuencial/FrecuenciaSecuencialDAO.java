@@ -1,69 +1,51 @@
 package colectivo.secuencial;
 
+import colectivo.dao.FrecuenciaDAO;
 import colectivo.modelo.Frecuencia;
-import colectivo.util.ArchivoUtil;
 import colectivo.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.*;
 import java.util.*;
 
-/**
- * DAO secuencial para Frecuencia.
- * Lee archivo configurado y carga solo una vez (bandera).
- *
- * Formato por línea esperado (ejemplo): idLinea;horaInicio;horaFin;intervalo;tipoDia
- */
-public class FrecuenciaSecuencialDAO {
-
+public class FrecuenciaSecuencialDAO implements FrecuenciaDAO {
     private static final Logger logger = LogManager.getLogger(FrecuenciaSecuencialDAO.class);
-
-    private final List<Frecuencia> cacheFrecuencias = new ArrayList<>();
+    private final List<Frecuencia> cache = new ArrayList<>();
     private boolean cargado = false;
 
-    /**
-     * Devuelve la lista de frecuencias. Carga desde archivo solo la primera vez.
-     */
+    @Override
     public List<Frecuencia> buscarTodos() {
-        if (cargado) {
-            logger.debug("Frecuencias ya cargadas, devolviendo caché ({} items).", cacheFrecuencias.size());
-            return cacheFrecuencias;
-        }
-        cargado = true;
-
+        if (cargado) return cache;
         String ruta = Config.getInstance().get("ruta.frecuencias", "doc/frecuencia_PM.txt");
-        logger.info("Cargando frecuencias desde {}", ruta);
-
-        List<String> lineas = ArchivoUtil.leerArchivo(ruta);
-        for (String linea : lineas) {
-            try {
-                String[] partes = Arrays.stream(linea.split(";"))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .toArray(String[]::new);
-
-                if (partes.length < 5) {
-                    logger.warn("Línea de frecuencia con menos de 5 campos (omitida): {}", linea);
+        try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                String[] parts = Arrays.stream(line.split(";")).map(String::trim).toArray(String[]::new);
+                if (parts.length < 5) {
+                    logger.warn("Línea de frecuencia con menos de 5 campos (omitida): {}", line);
                     continue;
                 }
-
-                String idLinea = partes[0];
-                String horaInicio = partes[1];
-                String horaFin = partes[2];
-                int intervalo = Integer.parseInt(partes[3]);
-                int tipoDia = Integer.parseInt(partes[4]);
-
-                Frecuencia f = new Frecuencia(idLinea, horaInicio, horaFin, intervalo, tipoDia);
-                cacheFrecuencias.add(f);
-
-            } catch (NumberFormatException nfe) {
-                logger.warn("Formato numérico inválido en línea de frecuencia (omitida): {} -> {}", linea, nfe.getMessage());
-            } catch (Exception e) {
-                logger.warn("Error procesando línea de frecuencia '{}': {}", linea, e.getMessage());
+                try {
+                    String idLinea = parts[0];
+                    String horaInicio = parts[1];
+                    String horaFin = parts[2];
+                    int intervalo = Integer.parseInt(parts[3]);
+                    int tipoDia = Integer.parseInt(parts[4]);
+                    cache.add(new Frecuencia(idLinea, horaInicio, horaFin, intervalo, tipoDia));
+                } catch (Exception e) {
+                    logger.warn("Línea de frecuencia malformada (omitida): {} -> {}", line, e.getMessage());
+                }
             }
+            cargado = true;
+            logger.info("Frecuencias cargadas: {}", cache.size());
+        } catch (FileNotFoundException e) {
+            logger.error("Archivo frecuencias no encontrado: " + ruta, e);
+        } catch (IOException e) {
+            logger.error("Error leyendo frecuencias: " + ruta, e);
         }
-
-        logger.info("Total de frecuencias cargadas: {}", cacheFrecuencias.size());
-        return cacheFrecuencias;
+        return cache;
     }
 }
