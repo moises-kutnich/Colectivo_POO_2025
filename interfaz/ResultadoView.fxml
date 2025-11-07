@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="colectivo.interfaz.ResultadoController">
+
+    <!-- Barra superior -->
+    <top>
+        <ToolBar>
+            <Label text="Resultados de la búsqueda"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="Volver" onAction="#onVolver"/>
+        </ToolBar>
+    </top>
+
+    <!-- Contenido principal -->
+    <center>
+        <VBox spacing="12">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+
+            <!-- Tabla de recorridos -->
+            <TableView fx:id="tblSegmentos" prefHeight="250" VBox.vgrow="NEVER">
+                <columns>
+                    <TableColumn fx:id="colLinea" text="Tipo / Línea" prefWidth="120"/>
+                    <TableColumn fx:id="colParadas" text="Paradas" prefWidth="280"/>
+                    <TableColumn fx:id="colSalida" text="Hora salida" prefWidth="90"/>
+                    <TableColumn fx:id="colEspera" text="Espera (min)" prefWidth="100"/>
+                    <TableColumn fx:id="colDur" text="Duración" prefWidth="100"/>
+                    <TableColumn fx:id="colHoraLlegada" text="Hora llegada" prefWidth="90"/>
+                </columns>
+            </TableView>
+
+            <!-- Separador visual -->
+            <Separator/>
+
+            <!-- Título del mapa -->
+            <Label text="Mapa del recorrido"
+                   style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 4 0 4 0;"/>
+
+            <!-- Mapa interactivo -->
+            <AnchorPane VBox.vgrow="ALWAYS">
+                <WebView fx:id="mapView" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+                         AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+                         prefHeight="400"/>
+            </AnchorPane>
+        </VBox>
+    </center>
+</BorderPane>
